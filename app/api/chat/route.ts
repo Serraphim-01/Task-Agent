@@ -1,54 +1,67 @@
 export const dynamic = "force-dynamic";
 
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const n8nUrl = process.env.N8N_URL;
+  const n8nBaseUrl = process.env.N8N_URL;
 
-  if (!n8nUrl) {
-    console.error("❌ N8N_URL env var is missing");
+  if (!n8nBaseUrl) {
     return NextResponse.json(
-      { error: 'n8n webhook URL is not configured.' },
+      { error: "n8n webhook URL is not configured." },
       { status: 500 }
     );
   }
 
   try {
     const body = await request.json();
-    console.log("📤 Sending to n8n:", JSON.stringify(body, null, 2));
+
+    // Extract known query params
+    const { query, companyId, sessionId, ...restBody } = body;
+
+    // Build query string
+    const qs = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ query, companyId, sessionId }).filter(
+          ([, v]) => v !== undefined && v !== null
+        )
+      )
+    ).toString();
+
+    const n8nUrl = `${n8nBaseUrl}${qs ? `?${qs}` : ""}`;
+
+    // Before sending to n8n
+    console.log("=== Outgoing request to n8n webhook ===");
+    console.log("Webhook URL:", n8nUrl);
+    console.log("Query params:", { query, companyId, sessionId });
+    console.log("Request body:", restBody);
+    console.log(
+      "Full request payload (stringified):",
+      JSON.stringify(restBody, null, 2)
+    );
 
     const n8nResponse = await fetch(n8nUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(restBody),
     });
 
-    const rawText = await n8nResponse.text();
-    console.log("📥 Raw response from n8n:", rawText);
-
     if (!n8nResponse.ok) {
+      const errorText = await n8nResponse.text();
+      console.error("n8n API Error:", errorText);
       return NextResponse.json(
-        { error: `n8n webhook error: ${n8nResponse.statusText}`, raw: rawText },
+        { error: `n8n webhook error: ${n8nResponse.statusText}` },
         { status: n8nResponse.status }
       );
     }
 
-    let parsed;
-    try {
-      parsed = JSON.parse(rawText);
-    } catch {
-      console.warn("⚠️ Response is not valid JSON, wrapping as text");
-      parsed = { reply: rawText };
-    }
-
-    return NextResponse.json(parsed);
+    const data = await n8nResponse.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('❌ API Route Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    console.error("API Route Error:", error);
     return NextResponse.json(
-      { error: 'Failed to proxy request to n8n.', details: errorMessage },
+      { error: "Failed to proxy request to n8n.", details: String(error) },
       { status: 500 }
     );
   }
