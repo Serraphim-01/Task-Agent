@@ -30,8 +30,8 @@ interface SidebarProps {
 
 const navigation = [
   { name: 'Chat', href: '/', icon: MessageSquare },
-  { name: 'Documentation', href: '/docs', icon: FileText },
-  { name: 'Changelog', href: '/changelog', icon: History },
+  // { name: 'Documentation', href: '/docs', icon: FileText },
+  // { name: 'Changelog', href: '/changelog', icon: History },
 ];
 
 export function Sidebar({ selectedCompany, onCompanyChange }: SidebarProps) {
