@@ -127,10 +127,10 @@ First, you need to create an n8n workflow that will process the user's queries.
 Once you have your n8n workflow and the Production Webhook URL, you need to configure the application to use it.
 
 1.  **Create a `.env.local` file** in the root of the project if you don't have one already.
-2.  **Add the `NEXT_PUBLIC_N8N_URL` environment variable** to the `.env.local` file with the URL you copied from n8n.
+2.  **Add the `N8N_URL` environment variable** to the `.env.local` file with the URL you copied from n8n. Note that we are using `N8N_URL` and not `NEXT_PUBLIC_N8N_URL` because this variable is now used server-side only and should not be exposed to the browser.
 
     ```
-    NEXT_PUBLIC_N8N_URL=https://your-n8n-instance.com/webhook/your-secret-task-agent
+    N8N_URL=https://your-n8n-instance.com/webhook/your-secret-task-agent
     ```
 
 3.  **Restart the application**. The application will now use your n8n workflow to handle user queries.

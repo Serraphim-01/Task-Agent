@@ -5,7 +5,6 @@ export const config = {
     version: "1.0.0"
   },
   api: {
-    n8nUrl: process.env.NEXT_PUBLIC_N8N_URL || "https://replace-with-your-n8n-instance.com/webhook/your-secret-path",
     timeout: 15000 // 15 seconds
   },
   colors: {

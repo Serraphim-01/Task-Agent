@@ -43,7 +43,7 @@ export class TaskAgentAPI {
     const timeoutId = setTimeout(() => controller.abort(), config.api.timeout);
 
     try {
-      const response = await fetch(config.api.n8nUrl, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

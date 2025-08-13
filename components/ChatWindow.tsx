@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, ArrowDown } from 'lucide-react';
-import { config } from '@/config/config';
 import { ChatMessage, taskAgentAPI } from '@/lib/api';
 import { ChatBubble } from './ChatBubble';
 import { TypingIndicator } from './TypingIndicator';
@@ -48,14 +47,6 @@ export function ChatWindow({ selectedCompany }: ChatWindowProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  useEffect(() => {
-    if (config.api.n8nUrl.includes('replace-with-your-n8n-instance.com')) {
-      toast.warning('n8n URL is not configured. Please check the documentation.', {
-        duration: Infinity,
-      });
-    }
-  }, []);
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
